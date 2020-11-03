@@ -10,14 +10,15 @@ usage: parser.py xml_filename dtd_filename outputfile
 
 Parse the DBLP XML file and convert it to CSV
 
-positional arguments:
-  xml_filename          The XML file that will be parsed
+Arguments:
+  xml_filename          The DBLP XML file that will be parsed
   dtd_filename          The DTD file used to parse the XML file
-  outputfile            The output CSV file
+  outputfile            The output CSV filename
 
 ```
 
 ## Some outputs
+Elements & Attributes: 
 ```
 Elements : {'book', 'proceedings', 'www', 'inproceedings', 'article', 'phdthesis', 'incollection', 'mastersthesis'}
 Attributes : {
@@ -49,7 +50,7 @@ Attributes : {
                                   'school'}
              }
 ```
-Example of output files : 
+Example of output files: 
     ![image](output.png)
 
 
