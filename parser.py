@@ -48,7 +48,6 @@ def get_attributes(xml_file, elements, attributes) -> dict:
 
     for element in elements:
         if len(attributes_dict[element]) == 0:
-            print(element)
             attributes_dict.pop(element)
 
     print(attributes_dict)
@@ -105,7 +104,6 @@ def parse_args():
 class AttributeHandler(ContentHandler):
     def __init__(self, elements: set, attributes: set):
         ContentHandler.__init__(self)
-        self.index = 0
         self.CurrentTag = ""
         self.CurrentAttr = list()
         self.PreTag = ""
@@ -119,9 +117,6 @@ class AttributeHandler(ContentHandler):
         return self.AttributesDict
 
     def startElement(self, tag, attributes):
-        self.index += 1
-        if self.index % 10000000 == 0:
-            print(self.index)
         if self.PreTag == "" and tag in self.Elements:
             self.PreTag = tag
             keys = attributes.keys()
@@ -131,14 +126,12 @@ class AttributeHandler(ContentHandler):
             self.CurrentTag = tag
             self.CurrentAttr = attributes.keys()
 
-    # 元素结束事件处理
     def endElement(self, tag):
         if tag == self.CurrentTag:
             self.CurrentTag = ""
         elif tag == self.PreTag:
             self.PreTag = ""
 
-    # 内容事件处理
     def characters(self, content):
         if self.PreTag != "" and self.CurrentTag != "" and content is not None:
             attr = self.AttributesDict[self.PreTag]
@@ -164,22 +157,17 @@ class DataHandler(ContentHandler):
 
     def startElement(self, tag, attributes):
         if self.PreTag == "" and tag in self.Elements:
-            if self.index % 10000000 == 0:
-                print(self.index)
             self.PreTag = tag
             self.data.clear()
             self.multiple_valued_cells.clear()
             keys = attributes.keys()
             if len(keys) > 0:
                 self.data.update(attributes)
-            # if "key" in keys and attributes["key"] == "phd/hal/Krichen13":
-            #     print("dd")
         elif self.PreTag != "" and self.CurrentTag == "" and tag in self.AttributesDict[self.PreTag]:
             self.CurrentTag = tag
             self.PersistringTag = False
             self.CurrentAttr = attributes
 
-    # 元素结束事件处理
     def endElement(self, tag):
         if tag == self.CurrentTag:
             self.CurrentTag = ""
@@ -187,7 +175,6 @@ class DataHandler(ContentHandler):
             for cell in self.multiple_valued_cells:
                 self.data[cell] = '|||'.join(sorted(self.data[cell]))
             self.data['id'] = self.index
-            # print(self.data)
             self.Output_files[self.PreTag].writerow(self.data)
             self.index += 1
             self.PreTag = ""
@@ -210,7 +197,6 @@ class DataHandler(ContentHandler):
         else:
             self.data[column_name] = entry + value
 
-    # 内容事件处理
     def characters(self, content):
         if self.PreTag != "" and self.CurrentTag != "" and content is not None:
             if not self.PersistringTag:
@@ -224,44 +210,15 @@ class DataHandler(ContentHandler):
                 self.set_cell_value(column_name, v)
 
 
-def main_1():
+def main():
     args = parse_args()
     if args.xml_filename is not None and args.dtd_filename is not None and args.outputfile is not None:
-        print('Start!')
         with open(args.dtd_filename, mode='rb') as dtd_file:
             print('Reading elements from DTD file...')
             elements, attributes = get_elements(dtd_file)
         with open(args.xml_filename, mode='rb') as xml_file:
             print('Finding unique attributes for all elements...')
-            # attributes_dict = get_attributes(xml_file, elements, attributes)
-            attributes_dict = {
-                'book': {'isbn', 'isbn-type', 'booktitle', 'publisher', 'cite', 'cite-label', 'series-href',
-                         'publisher-href', 'year', 'editor', 'editor-orcid', 'author', 'note', 'pages', 'ee', 'school',
-                         'note-type', 'mdate', 'month', 'url', 'title', 'ee-type', 'series', 'publtype', 'author-orcid',
-                         'author-bibtex', 'crossref', 'cdrom', 'volume', 'key'},
-                'proceedings': {'address', 'isbn', 'isbn-type', 'booktitle', 'publisher', 'cite', 'cite-label',
-                                'series-href', 'publisher-href', 'journal', 'year', 'editor-orcid', 'editor', 'author',
-                                'note', 'pages', 'ee', 'note-type', 'mdate', 'url', 'title', 'number', 'ee-type',
-                                'series', 'publtype', 'volume', 'key'},
-                'www': {'publtype', 'year', 'editor', 'note-type', 'author', 'mdate', 'crossref', 'note', 'url', 'cite',
-                        'note-label', 'title', 'url-type', 'ee', 'key', 'author-bibtex'},
-                'inproceedings': {'booktitle', 'cite', 'cite-label', 'year', 'editor', 'editor-orcid', 'author', 'note',
-                                  'pages', 'ee', 'note-type', 'mdate', 'month', 'author-aux', 'url', 'title', 'number',
-                                  'title-bibtex', 'ee-type', 'author-orcid', 'publtype', 'crossref', 'cdrom', 'volume',
-                                  'key'},
-                'article': {'booktitle', 'publisher', 'cite', 'cite-label', 'journal', 'year', 'editor', 'editor-orcid',
-                            'author', 'note', 'pages', 'ee', 'note-type', 'mdate', 'month', 'author-aux', 'url',
-                            'title', 'number', 'ee-type', 'title-bibtex', 'author-orcid', 'publtype', 'crossref',
-                            'cdrom', 'cdate', 'volume', 'key'},
-                'phdthesis': {'publtype', 'isbn', 'year', 'isbn-type', 'author', 'note-type', 'mdate', 'publisher',
-                              'note', 'month', 'series', 'title', 'pages', 'ee', 'series-href', 'number', 'volume',
-                              'ee-type', 'key', 'author-orcid', 'school'},
-                'incollection': {'publtype', 'year', 'author', 'mdate', 'booktitle', 'crossref', 'url', 'cdrom',
-                                 'publisher', 'note', 'cite', 'cite-label', 'title', 'chapter', 'pages', 'ee', 'number',
-                                 'ee-type', 'key', 'publisher-href', 'author-orcid'},
-                'mastersthesis': {'year', 'author', 'note-type', 'mdate', 'note', 'title', 'ee', 'ee-type', 'key',
-                                  'school'}}
-
+            attributes_dict = get_attributes(xml_file, elements, attributes)
         print('Opening output files...')
         output_files = open_outputfiles(elements, attributes_dict, args.outputfile)
 
@@ -271,4 +228,4 @@ def main_1():
 
 
 if __name__ == '__main__':
-    main_1()
+    main()
