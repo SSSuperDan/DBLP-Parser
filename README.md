@@ -1,3 +1,11 @@
+# Download and unzip files
+
+```shell
+wget https://dblp.org/xml/release/dblp-2023-04-02.xml.gz
+wget https://dblp.org/xml/release/dblp-2019-11-22.dtd
+gzip -d dblp-2023-04-02.xml.gz 
+```
+
 # DBLP2CSV
 Convert a DBLP XML file (https://dblp.uni-trier.de/xml/) to CSV format. A SAX implementation of dblp-to-csv (https://github.com/ThomHurks/dblp-to-csv) that is capable to handle up-to-date large dblp xml files.
 
@@ -53,4 +61,26 @@ Attributes : {
 Example of output files: 
     ![image](output.png)
 
+
+# CSV TO MLG
+
+```shell
+python csv_to_mlg.py -s [start-year] -e [end-year]
+```
+
+- Start year is set to be 2016 by default, while end year is set to be 2022 by default.
+
+- In default setting, we can get a graph with 7 layers, in each layer, there are 689k nodes and 14M edges in total
+
+- In detail, 
+    ```shell
+
+    NodeNum = 689886
+    EdgeNum = {1: 1287806, 2: 1514599, 3: 1846423, 4: 2238252, 5: 2487581, 6: 2706280, 7: 2793023}
+
+    ```
+
+- Layer 1-6 represent year 2016 to year 2022.
+
+- Each node represent an author, while an edge connecting two nodes in a layer l represents that two author co-author a certain paper in year l.
 

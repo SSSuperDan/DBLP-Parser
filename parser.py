@@ -220,7 +220,8 @@ def main():
             print('Finding unique attributes for all elements...')
             attributes_dict = get_attributes(xml_file, elements, attributes)
         print('Opening output files...')
-        output_files = open_outputfiles(elements, attributes_dict, args.outputfile)
+        outputfile = "output.csv"
+        output_files = open_outputfiles(elements, attributes_dict, outputfile)
 
         with open(args.xml_filename, mode='rb') as xml_file:
             print('Parsing XML and writing to CSV files...')
